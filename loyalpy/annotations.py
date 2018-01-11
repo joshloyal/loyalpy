@@ -2,6 +2,8 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 from matplotlib import patheffects
+from matplotlib.patches import FancyArrowPatch
+from mpl_toolkits.mplot3d import proj3d
 
 
 def label_line(line, label, x, y, color='0.5', size=12):
@@ -47,8 +49,9 @@ def label_line(line, label, x, y, color='0.5', size=12):
     return text
 
 
-def label_ray(ray_xy1, ray_xy2, label, x, y, ax=None, color='0.5', size=12):
-    """Add a label to an ray at the proper angle.
+def label_abline(a_coords, b_coords, label, x, y, ax=None, color='0.5',
+                 size=12, outline=False):
+    """Add a label to an abline at the proper angle.
 
     Parameters
     ----------
@@ -70,8 +73,8 @@ def label_ray(ray_xy1, ray_xy2, label, x, y, ax=None, color='0.5', size=12):
     if ax is None:
         ax = plt.gca()
 
-    x1, y1 = ray_xy1
-    x2, y2 = ray_xy2
+    x1, y1 = a_coords
+    x2, y2 = b_coords
 
     text = ax.annotate(label, xy=(x, y), xytext=(-10, 0),
                        textcoords='offset points',
@@ -89,7 +92,22 @@ def label_ray(ray_xy1, ray_xy2, label, x, y, ax=None, color='0.5', size=12):
     if slope_degrees < -90:
         slope_degrees = 180 + slope_degrees
     text.set_rotation(slope_degrees)
-    text.set_path_effects([
-        patheffects.withStroke(linewidth=2, foreground='k')])
+
+    if outline:
+        text.set_path_effects([
+            patheffects.withStroke(linewidth=2, foreground='k')])
 
     return text
+
+
+class Arrow3D(FancyArrowPatch):
+    """Draw an arrow on a 3d plot."""
+    def __init__(self, xs, ys, zs, *args, **kwargs):
+        FancyArrowPatch.__init__(self, (0,0), (0,0), *args, **kwargs)
+        self._verts3d = xs, ys, zs
+
+    def draw(self, renderer):
+        xs3d, ys3d, zs3d = self._verts3d
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, renderer.M)
+        self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
+        FancyArrowPatch.draw(self, renderer)

@@ -1,6 +1,9 @@
 from matplotlib import pyplot as plt
 
 
+__all__ = ['abline']
+
+
 def abline(a_coords, b_coords, ax=None, **kwargs):
     """Draw a line connecting a point `a_coords` with a point `b_coords`.
 

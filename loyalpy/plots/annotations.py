@@ -6,6 +6,9 @@ from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
 
+__all__ = ['label_line', 'label_abline', 'Arrow3D']
+
+
 def label_line(line, label, x, y, color='0.5', size=12):
     """Add a label to a line, at the proper angle.
 
